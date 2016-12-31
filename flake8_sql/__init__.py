@@ -1,4 +1,4 @@
 from .linter import Linter
 
 
-__all__ = ('Linter')
+__all__ = (Linter)

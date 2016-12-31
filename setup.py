@@ -1,10 +1,10 @@
 import os
 
-from setuptools import setup
+from setuptools import setup, find_packages
 
-PROJECT_ROOT = os.path.abspath(os.path.dirname(__file__))
+PROJECT_ROOT = os.path.dirname(__file__)
 
-with open(os.path.join(PROJECT_ROOT, 'flake8_sql/linter.py')) as file_:
+with open(os.path.join(PROJECT_ROOT, 'flake8_sql', 'linter.py')) as file_:
     version_line = [line for line in file_ if line.startswith('__version__')][0]
 
 __version__ = version_line.split('=')[1].strip().strip("'").strip('"')
@@ -38,6 +38,7 @@ setup(
         'Topic :: Software Development :: Libraries :: Python Modules',
         'Topic :: Software Development :: Quality Assurance',
     ],
+    packages=find_packages(exclude=["tests"]),
     py_modules=['flake8_sql'],
     install_requires=[
         'flake8',

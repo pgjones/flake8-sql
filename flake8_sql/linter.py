@@ -8,9 +8,9 @@ from .keywords import ABBREVIATED_KEYWORDS, KEYWORDS
 __version__ = "0.1"
 
 SQL_RE = re.compile(
-    r'(select\s.*from\s|' \
-    r'delete\s+from\s|' \
-    r'insert\s+into\s.*values\s|' \
+    r'(select\s.*from\s|'
+    r'delete\s+from\s|'
+    r'insert\s+into\s.*values\s|'
     r'update\s.*set\s)',
     re.IGNORECASE | re.DOTALL,
 )
