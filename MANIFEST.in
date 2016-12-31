@@ -1,4 +1,4 @@
 include LICENSE
 include README.md
 recursive-include flask8_sql *.py
-include tests.py
+recursive-include tests *.py
