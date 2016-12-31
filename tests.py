@@ -9,6 +9,7 @@ query = \"""select clmn
 query = text(\"""SELECT clmn
                    FROM tbl\""")
 query = "SELECT tableColumn FROM tbl"  # Q441
+query = "SELECT ABS(clmn) FROM tbl"  # Q442
 """
 
 def test_expected_errors() -> None:

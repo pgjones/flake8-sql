@@ -2,7 +2,7 @@ import ast
 import re
 from typing import Any, Generator, List, Tuple
 
-from .keywords import KEYWORDS
+from .keywords import ABBREVIATED_KEYWORDS, KEYWORDS
 
 
 __version__ = "0.1"
@@ -35,6 +35,12 @@ class Linter:
     ) -> Generator[Tuple[int, int, str, type], Any, None]:
         words = WORD_RE.findall(query.s)
         for word in words:
+            if word.upper() in ABBREVIATED_KEYWORDS:
+                yield(
+                    query.lineno, query.col_offset,
+                    "Q442 avoid abbreviated keywords, {}".format(word),
+                    type(self),
+                )
             if word.upper() in KEYWORDS:
                 if word.upper() != word:
                     yield(

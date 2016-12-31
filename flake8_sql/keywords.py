@@ -1,7 +1,14 @@
-KEYWORDS = {
+ABBREVIATED_KEYWORDS = {
+    'ABS',
+    'CHAR',
+    'CHAR_LENGTH',
+    'DEC',
+    'PROC',
+}
+
+KEYWORDS = ABBREVIATED_KEYWORDS | {
     'A',
     'ABORT',
-    'ABS',
     'ABSOLUTE',
     'ACCESS',
     'ACTION',
@@ -72,8 +79,6 @@ KEYWORDS = {
     'CEILING',
     'CHAIN',
     'CHANGE',
-    'CHAR',
-    'CHAR_LENGTH',
     'CHARACTER',
     'CHARACTER_LENGTH',
     'CHARACTER_SET_CATALOG',
@@ -169,7 +174,6 @@ KEYWORDS = {
     'DAYOFYEAR',
     'DBCC',
     'DEALLOCATE',
-    'DEC',
     'DECIMAL',
     'DECLARE',
     'DEFAULT',
@@ -540,7 +544,6 @@ KEYWORDS = {
     'PRINT',
     'PRIOR',
     'PRIVILEGES',
-    'PROC',
     'PROCEDURAL',
     'PROCEDURE',
     'PROCESS',
