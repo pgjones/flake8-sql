@@ -15,6 +15,8 @@ SQL_RE = re.compile(
     re.IGNORECASE | re.DOTALL,
 )
 WORD_RE = re.compile(r'[\w]+')
+INCORRECT_WHITESPACE_AROUND_COMMA_RE = re.compile(r'(,[\S^\n]|\s,)')
+INCORRECT_WHITESPACE_AROUND_EQUALS_RE = re.compile(r'(\S=|=\S)')
 
 
 class Linter:
@@ -29,6 +31,7 @@ class Linter:
         for node in ast.walk(self.tree):
             if isinstance(node, ast.Str) and SQL_RE.search(node.s) is not None:
                 yield from self._check_query_words(node)
+                yield from self._check_query_whitespace(node)
 
     def _check_query_words(
             self, query: ast.Str,
@@ -55,3 +58,19 @@ class Linter:
                         "Q441 name {} is not snake_case".format(word),
                         type(self),
                     )
+
+    def _check_query_whitespace(
+            self, query: ast.Str,
+    ) -> Generator[Tuple[int, int, str, type], Any, None]:
+        if INCORRECT_WHITESPACE_AROUND_COMMA_RE.search(query.s) is not None:
+            yield(
+                query.lineno, query.col_offset,
+                "Q443 incorrect whitespace around comma",
+                type(self),
+            )
+        if INCORRECT_WHITESPACE_AROUND_EQUALS_RE.search(query.s) is not None:
+            yield(
+                query.lineno, query.col_offset,
+                "Q444 incorrect whitespace around equals",
+                type(self),
+            )

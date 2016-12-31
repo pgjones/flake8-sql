@@ -26,6 +26,14 @@ Avoid using [abbreviated
 keywords](https://github.com/PyCQA/flake8-import-order/blob/master/flake8_sql/keywords.py)
 instead use the full length version.
 
+### Q443 Incorrect whitespace around comma
+
+Commas should be followed by whitespace, but not preceeded.
+
+### Q444 Incorrect whitespace around equals
+
+Equals should be surrounded with whitespace.
+
 ## Limitations
 
 String constants are sought out in the code and considered SQL if they
