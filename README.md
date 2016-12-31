@@ -1,6 +1,6 @@
 # Flake8-SQL
 
-![Build Status](https://travis-ci.org/pgjones/flake8-sql.png?branch=master)
+[![Build Status](https://travis-ci.org/pgjones/flake8-sql.svg?branch=master)](https://travis-ci.org/pgjones/flake8-sql)
 
 Flake8-SQL is a [flake8](http://flake8.readthedocs.org/en/latest/)
 plugin that looks for SQL queries and checks then against some
