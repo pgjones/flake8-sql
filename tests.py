@@ -8,6 +8,7 @@ query = \"""select clmn
               FROM tbl\"""  # Q440
 query = text(\"""SELECT clmn
                    FROM tbl\""")
+query = "SELECT tableColumn FROM tbl"  # Q441
 """
 
 def test_expected_errors() -> None:

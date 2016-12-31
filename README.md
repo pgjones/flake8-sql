@@ -11,10 +11,14 @@ Guide](http://www.sqlstyle.guide/), but differ as detailed below.
 
 ### Q440 Keyword is not uppercase
 
-This checks and ensures that all the SQL reserved
+This checks that all the SQL reserved
 [keywords](https://github.com/PyCQA/flake8-import-order/blob/master/flake8_sql/keywords.py)
 are uppercase.
 
+### Q441 Name is not snake_case
+
+This checks that all the non SQL keywords are snake_case, which due to
+a limitation means simply that the word is lowercase.
 
 ## Limitations
 
