@@ -3,6 +3,7 @@ import re
 from typing import Any, Generator, List, Tuple
 
 from .keywords import ABBREVIATED_KEYWORDS, KEYWORDS
+from .parser import parse
 
 
 __version__ = "0.1"
@@ -32,6 +33,7 @@ class Linter:
             if isinstance(node, ast.Str) and SQL_RE.search(node.s) is not None:
                 yield from self._check_query_words(node)
                 yield from self._check_query_whitespace(node)
+                yield from self._check_query_linespace(node)
 
     def _check_query_words(
             self, query: ast.Str,
@@ -74,3 +76,18 @@ class Linter:
                 "Q444 incorrect whitespace around equals",
                 type(self),
             )
+
+    def _check_query_linespace(
+            self, query: ast.Str,
+    ) -> Generator[Tuple[int, int, str, type], Any, None]:
+        parsed = parse(query)
+        if len(parsed) == 0 or parsed[0].line == parsed[-1].line:
+            return
+        previous = parsed[0]
+        for phrase in parsed[1:]:
+            if phrase.line == previous.line:
+                message = "Q445 missing linespace between phrases {} and {}".format(
+                    previous.phrase, phrase.phrase,
+                )
+                yield (query.lineno, query.col_offset, message, type(self))
+            previous = phrase

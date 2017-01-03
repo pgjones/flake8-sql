@@ -34,6 +34,12 @@ Commas should be followed by whitespace, but not preceeded.
 
 Equals should be surrounded with whitespace.
 
+### Q445 Missing linespace between phrases
+
+The phrases `SELECT`, `FROM`, `INSERT INTO`, `VALUES`, `DELETE FROM`,
+`WHERE`, `UPDATE`, and `SET` should be on separate lines (unless the
+entire query is on one line).
+
 ## Limitations
 
 String constants are sought out in the code and considered SQL if they
