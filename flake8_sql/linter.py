@@ -17,7 +17,7 @@ SQL_RE = re.compile(
 )
 WORD_RE = re.compile(r'[\w]+')
 INCORRECT_WHITESPACE_AROUND_COMMA_RE = re.compile(r'(,[\S]|\s,)')
-INCORRECT_WHITESPACE_AROUND_EQUALS_RE = re.compile(r'(\S=|=\S)')
+INCORRECT_WHITESPACE_AROUND_EQUALS_RE = re.compile(r'(\S(?:=|!=|<>)|(?:=|!=|<>)\S)')
 MISSING_NEWLINE_AFTER_SEMICOLON_RE = re.compile(r';[^\n\r]')
 
 
