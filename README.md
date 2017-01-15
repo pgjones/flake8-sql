@@ -40,6 +40,10 @@ The phrases `SELECT`, `FROM`, `INSERT INTO`, `VALUES`, `DELETE FROM`,
 `WHERE`, `UPDATE`, and `SET` should be on separate lines (unless the
 entire query is on one line).
 
+### Q446 Missing newline after semicolon
+
+Semicolons must be at the end of the line.
+
 ## Limitations
 
 String constants are sought out in the code and considered SQL if they

@@ -6,7 +6,7 @@ from .keywords import ABBREVIATED_KEYWORDS, KEYWORDS
 from .parser import parse
 
 
-__version__ = "0.1"
+__version__ = '0.1'
 
 SQL_RE = re.compile(
     r'(select\s.*from\s|'
@@ -16,8 +16,9 @@ SQL_RE = re.compile(
     re.IGNORECASE | re.DOTALL,
 )
 WORD_RE = re.compile(r'[\w]+')
-INCORRECT_WHITESPACE_AROUND_COMMA_RE = re.compile(r'(,[\S^\n]|\s,)')
+INCORRECT_WHITESPACE_AROUND_COMMA_RE = re.compile(r'(,[\S]|\s,)')
 INCORRECT_WHITESPACE_AROUND_EQUALS_RE = re.compile(r'(\S=|=\S)')
+MISSING_NEWLINE_AFTER_SEMICOLON_RE = re.compile(r';[^\n\r]')
 
 
 class Linter:
@@ -67,13 +68,19 @@ class Linter:
         if INCORRECT_WHITESPACE_AROUND_COMMA_RE.search(query.s) is not None:
             yield(
                 query.lineno, query.col_offset,
-                "Q443 incorrect whitespace around comma",
+                'Q443 incorrect whitespace around comma',
                 type(self),
             )
         if INCORRECT_WHITESPACE_AROUND_EQUALS_RE.search(query.s) is not None:
             yield(
                 query.lineno, query.col_offset,
-                "Q444 incorrect whitespace around equals",
+                'Q444 incorrect whitespace around equals',
+                type(self),
+            )
+        if MISSING_NEWLINE_AFTER_SEMICOLON_RE.search(query.s) is not None:
+            yield(
+                query.lineno, query.col_offset,
+                'Q446 missing newline after semicolon',
                 type(self),
             )
 
