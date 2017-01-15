@@ -9,7 +9,7 @@ with open(os.path.join(PROJECT_ROOT, 'flake8_sql', 'linter.py')) as file_:
 
 __version__ = version_line.split('=')[1].strip().strip("'").strip('"')
 
-with open(os.path.join(PROJECT_ROOT, 'README.md')) as file_:
+with open(os.path.join(PROJECT_ROOT, 'README.rst')) as file_:
     long_description = file_.read()
 
 setup(
