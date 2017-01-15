@@ -11,6 +11,7 @@ PHRASES_RE = re.compile(
     r'delete\s+from\s|'
     r'insert\s+into\s|'
     r'values\s|'
+    r'returning\s'
     r'update\s|'
     r'set\s|'
     r'where\s|'
