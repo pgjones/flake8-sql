@@ -12,7 +12,7 @@ Guide](http://www.sqlstyle.guide/), but differ as detailed below.
 ### Q440 Keyword is not uppercase
 
 All the SQL reserved
-[keywords](https://github.com/PyCQA/flake8-import-order/blob/master/flake8_sql/keywords.py)
+[keywords](https://github.com/pgjones/flake8-sql/blob/master/flake8_sql/keywords.py)
 should be uppercase.
 
 ### Q441 Name is not snake_case
@@ -23,12 +23,12 @@ limitation means simply that the word is lowercase.
 ### Q442 Avoid abbreviated keywords
 
 Avoid using [abbreviated
-keywords](https://github.com/PyCQA/flake8-import-order/blob/master/flake8_sql/keywords.py)
+keywords](https://github.com/pgjones/flake8-sql/blob/master/flake8_sql/keywords.py)
 instead use the full length version.
 
 ### Q443 Incorrect whitespace around comma
 
-Commas should be followed by whitespace, but not preceeded.
+Commas should be followed by whitespace, but not preceded.
 
 ### Q444 Incorrect whitespace around equals
 
