@@ -43,6 +43,7 @@ setup(
     install_requires=[
         'flake8',
         'setuptools',
+        'sqlparse',
     ],
     entry_points={
         'flake8.extension': [
