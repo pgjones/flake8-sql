@@ -1,6 +1,6 @@
 import ast
 import re
-from typing import Any, Generator, List, Tuple
+from typing import Any, Generator, Iterable, List, Optional, Tuple, TypeVar
 
 import sqlparse
 
@@ -17,9 +17,6 @@ SQL_RE = re.compile(
     r'update\s.*set\s)',
     re.IGNORECASE | re.DOTALL,
 )
-INCORRECT_WHITESPACE_AROUND_COMMA_RE = re.compile(r'(,[\S]|\s,)')
-INCORRECT_WHITESPACE_AROUND_EQUALS_RE = re.compile(r'(\S(?:=|!=|<>)|(?:=|!=|<>)\S)')
-MISSING_NEWLINE_AFTER_SEMICOLON_RE = re.compile(r';[^\n\r]')
 
 
 class Linter:
@@ -41,27 +38,26 @@ class Linter:
             self, query: ast.Str,
     ) -> Generator[Tuple[int, int, str, type], Any, None]:
         statements = sqlparse.parse(query.s)
-        for statement in statements:
-            for token in statement.flatten():
-                word = token.value
-                if token.is_keyword:
+        for token in _flattened_statements(statements):
+            word = token.value
+            if token.is_keyword:
+                yield from self._check_keyword(word, query)
+            elif token.ttype == sqlparse.tokens.Name:
+                # Function identifiers/names are not recognised as keywords in
+                # sqlparse, so this check is required. Note the only name-token
+                # who's grandparent is a function is the function identifier.
+                if (
+                        token.within(sqlparse.sql.Function) and
+                        isinstance(token.parent.parent, sqlparse.sql.Function) and
+                        sqlparse.keywords.is_keyword(word)[0] == sqlparse.tokens.Token.Keyword
+                ):
                     yield from self._check_keyword(word, query)
-                elif token.ttype == sqlparse.tokens.Name:
-                    # Function identifiers/names are not recognised as keywords in
-                    # sqlparse, so this check is required. Note the only name-token
-                    # who's grandparent is a function is the function identifier.
-                    if (
-                            token.within(sqlparse.sql.Function) and
-                            isinstance(token.parent.parent, sqlparse.sql.Function) and
-                            sqlparse.keywords.is_keyword(word)[0] == sqlparse.tokens.Token.Keyword
-                    ):
-                        yield from self._check_keyword(word, query)
-                    elif not word.islower():
-                        yield(
-                            query.lineno, query.col_offset,
-                            "Q441 name {} is not snake_case".format(word),
-                            type(self),
-                        )
+                elif not word.islower():
+                    yield(
+                        query.lineno, query.col_offset,
+                        "Q441 name {} is not snake_case".format(word),
+                        type(self),
+                    )
 
     def _check_keyword(
             self, word: str, query: ast.Str,
@@ -82,24 +78,33 @@ class Linter:
     def _check_query_whitespace(
             self, query: ast.Str,
     ) -> Generator[Tuple[int, int, str, type], Any, None]:
-        if INCORRECT_WHITESPACE_AROUND_COMMA_RE.search(query.s) is not None:
-            yield(
-                query.lineno, query.col_offset,
-                'Q443 incorrect whitespace around comma',
-                type(self),
-            )
-        if INCORRECT_WHITESPACE_AROUND_EQUALS_RE.search(query.s) is not None:
-            yield(
-                query.lineno, query.col_offset,
-                'Q444 incorrect whitespace around equals',
-                type(self),
-            )
-        if MISSING_NEWLINE_AFTER_SEMICOLON_RE.search(query.s) is not None:
-            yield(
-                query.lineno, query.col_offset,
-                'Q446 missing newline after semicolon',
-                type(self),
-            )
+        statements = sqlparse.parse(query.s)
+        for before, token, after in _pre_post_iter(_flattened_statements(statements)):
+            pre_whitespace = (before is not None and before.is_whitespace)
+            post_whitespace = (after is not None and after.is_whitespace)
+            post_newline = (after is None or after.ttype == sqlparse.tokens.Text.Whitespace.Newline)
+            if token.ttype == sqlparse.tokens.Punctuation:
+                if token.value == ',' and not post_whitespace:
+                    yield(
+                        query.lineno, query.col_offset,
+                        'Q443 incorrect whitespace around comma',
+                        type(self),
+                    )
+                elif token.value == ';' and not post_newline:
+                    yield(
+                        query.lineno, query.col_offset,
+                        'Q446 missing newline after semicolon',
+                        type(self),
+                    )
+            elif (
+                    token.ttype == sqlparse.tokens.Comparison
+                    and (not pre_whitespace or not post_whitespace)
+            ):
+                yield(
+                    query.lineno, query.col_offset,
+                    'Q444 incorrect whitespace around equals',
+                    type(self),
+                )
 
     def _check_query_linespace(
             self, query: ast.Str,
@@ -115,3 +120,28 @@ class Linter:
                 )
                 yield (query.lineno, query.col_offset, message, type(self))
             previous = phrase
+
+
+
+def _flattened_statements(
+        statements: Tuple[sqlparse.sql.Statement],
+) -> Generator[sqlparse.sql.Token, Any, None]:
+    for statement in statements:
+        for token in statement.flatten():
+            yield token
+
+
+T = TypeVar('T')
+
+
+def _pre_post_iter(
+        iterable: Iterable[T],
+) -> Generator[Tuple[Optional[T], T, Optional[T]], Any, None]:
+    iterator = iter(iterable)
+    before = None
+    current = next(iterator)
+    for after in iterator:
+        yield (before, current, after)
+        before = current
+        current = after
+    yield (before, current, None)
