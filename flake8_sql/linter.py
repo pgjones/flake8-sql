@@ -3,7 +3,7 @@ import re
 from typing import Any, Generator, Iterable, List, Optional, Tuple, TypeVar
 
 from .keywords import ABBREVIATED_KEYWORDS
-from .parser import Parser, parse
+from .parser import Parser
 
 
 __version__ = '0.1'
@@ -28,7 +28,8 @@ class Linter:
     def run(self) -> Generator[Tuple[int, int, str, type], Any, None]:
         for node in ast.walk(self.tree):
             if isinstance(node, ast.Str) and SQL_RE.search(node.s) is not None:
-                parser = Parser(node.s)
+                initial_offset = _get_initial_offset(node, self.lines)
+                parser = Parser(node.s, initial_offset)
                 yield from self._check_query_words(node, parser)
                 yield from self._check_query_whitespace(node, parser)
                 yield from self._check_query_linespace(node, parser)
@@ -38,7 +39,7 @@ class Linter:
     ) -> Generator[Tuple[int, int, str, type], Any, None]:
         for token in parser:
             word = token.value
-            if token.is_keyword:
+            if token.is_keyword or token.is_function_name:
                 if not word.isupper():
                     yield(
                         query.lineno, query.col_offset,
@@ -91,17 +92,19 @@ class Linter:
     def _check_query_linespace(
             self, query: ast.Str, parser: Parser,
     ) -> Generator[Tuple[int, int, str, type], Any, None]:
-        parsed = parse(query)
-        if len(parsed) == 0 or parsed[0].line == parsed[-1].line:
+        keywords = [
+            token for token in parser
+            if token.is_keyword and not token.value == "INSERT"
+        ]
+        if keywords[0].row == keywords[-1].row:
             return
-        previous = parsed[0]
-        for phrase in parsed[1:]:
-            if phrase.line == previous.line:
+
+        for before, keyword, _ in _pre_post_iter(keywords):
+            if before is not None and before.row == keyword.row:
                 message = "Q445 missing linespace between phrases {} and {}".format(
-                    previous.phrase, phrase.phrase,
+                    before.value, keyword.value,
                 )
                 yield (query.lineno, query.col_offset, message, type(self))
-            previous = phrase
 
 
 T = TypeVar('T')
@@ -118,3 +121,9 @@ def _pre_post_iter(
         before = current
         current = after
     yield (before, current, None)
+
+
+def _get_initial_offset(query: ast.Str, physical_lines: List[str]) -> int:
+    logical_lines = query.s.splitlines()
+    first_physical_line = physical_lines[query.lineno - len(logical_lines)]
+    return first_physical_line.find(logical_lines[0])

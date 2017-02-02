@@ -1,43 +1,14 @@
-import ast
-import re
-from typing import Any, Generator, List, NamedTuple
+from typing import Any, Generator
 
 import sqlparse
 
 
-Phrase = NamedTuple('Phrase', [('phrase', str), ('line', int)])
-
-
-PHRASES_RE = re.compile(
-    r'(select\s|'
-    r'from\s|'
-    r'delete\s+from\s|'
-    r'insert\s+into\s|'
-    r'values\s|'
-    r'returning\s'
-    r'update\s|'
-    r'set\s|'
-    r'where\s|'
-    r'\n)',
-    re.IGNORECASE,
-)
-
-
-def parse(query: ast.Str) -> List[Phrase]:
-    parsed = []
-    line = 0
-    for phrase in PHRASES_RE.finditer(query.s):
-        if phrase.group() == '\n':
-            line += 1
-        else:
-            parsed.append(Phrase(phrase.group().strip(), line))
-    return parsed
-
-
 class Token:
 
-    def __init__(self, token: sqlparse.sql.Token) -> None:
+    def __init__(self, token: sqlparse.sql.Token, row: int, col: int) -> None:
         self._token = token
+        self.row = row
+        self.col = col
 
     @property
     def is_whitespace(self) -> bool:
@@ -45,17 +16,18 @@ class Token:
 
     @property
     def is_keyword(self) -> bool:
-        simple_keyword = self._token.is_keyword
-        # Function identifiers/names are not recognised as keywords in
-        # sqlparse, so this check is required. Note the only name-token
-        # who's grandparent is a function is the function identifier.
-        function_keyword = (
+        return self._token.is_keyword
+
+    @property
+    def is_function_name(self) -> bool:
+        # Note the only name-token who's grandparent is a function is
+        # the function identifier.
+        return (
             self._token.ttype == sqlparse.tokens.Name and
             self._token.within(sqlparse.sql.Function) and
             isinstance(self._token.parent.parent, sqlparse.sql.Function) and
             sqlparse.keywords.is_keyword(self._token.value)[0] == sqlparse.tokens.Token.Keyword
         )
-        return simple_keyword or function_keyword
 
     @property
     def is_name(self) -> bool:
@@ -80,11 +52,20 @@ class Token:
 
 class Parser:
 
-    def __init__(self, sql: str) -> None:
+    def __init__(self, sql: str, initial_offset: int) -> None:
         self.sql = sql
+        self._initial_offset = initial_offset
 
     def __iter__(self) -> Generator[Token, Any, None]:
         statements = sqlparse.parse(self.sql)
+        row = 0
+        col = self._initial_offset
         for statement in statements:
-            for token in statement.flatten():
-                yield Token(token)
+            for sql_token in statement.flatten():
+                token = Token(sql_token, row, col)
+                yield token
+                if token.is_newline:
+                    row += 1
+                    col = 0
+                else:
+                    col += len(token.value)
