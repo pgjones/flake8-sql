@@ -1,5 +1,5 @@
 query = "SELECT abc FROM xyz"
 query = """SELECT abc FROM xyz
-            WHERE def = 'def'"""  # Q445
+            WHERE def = 'def'"""  # Q445 Q447
 query = """UPDATE abd SET xx = 'xx'
-            WHERE def = 'def'"""  # Q445
+            WHERE def = 'def'"""  # Q445 Q447

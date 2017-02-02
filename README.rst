@@ -41,10 +41,10 @@ Q444 Incorrect whitespace around equals
 
 Equals should be surrounded with whitespace.
 
-Q445 Missing linespace between phrases
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+Q445 Missing linespace between keywords
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-The phrases ``SELECT``, ``FROM``, ``INSERT INTO``, ``VALUES``,
+The keywords ``SELECT``, ``FROM``, ``INSERT INTO``, ``VALUES``,
 ``DELETE FROM``, ``WHERE``, ``UPDATE``, and ``SET`` should be on
 separate lines (unless the entire query is on one line).
 
@@ -52,6 +52,17 @@ Q446 Missing newline after semicolon
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 Semicolons must be at the end of the line.
+
+Q447 Keywords should be right aligned
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+The keywords ``SELECT``, ``FROM``, ``INSERT INTO``, ``VALUES``,
+``DELETE FROM``, ``WHERE``, ``UPDATE``, and ``SET`` should be right
+aligned i.e.
+
+    SELECT *
+      FROM table
+
 
 Limitations
 -----------

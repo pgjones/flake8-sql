@@ -32,7 +32,7 @@ class Linter:
                 parser = Parser(node.s, initial_offset)
                 yield from self._check_query_words(node, parser)
                 yield from self._check_query_whitespace(node, parser)
-                yield from self._check_query_linespace(node, parser)
+                yield from self._check_query_alignment(node, parser)
 
     def _check_query_words(
             self, query: ast.Str, parser: Parser,
@@ -89,22 +89,28 @@ class Linter:
                     type(self),
                 )
 
-    def _check_query_linespace(
+    def _check_query_alignment(
             self, query: ast.Str, parser: Parser,
     ) -> Generator[Tuple[int, int, str, type], Any, None]:
         keywords = [
             token for token in parser
-            if token.is_keyword and not token.value == "INSERT"
+            if token.is_keyword and token.value not in {'INSERT', 'ON'}
         ]
         if keywords[0].row == keywords[-1].row:
             return
 
         for before, keyword, _ in _pre_post_iter(keywords):
-            if before is not None and before.row == keyword.row:
-                message = "Q445 missing linespace between phrases {} and {}".format(
-                    before.value, keyword.value,
-                )
-                yield (query.lineno, query.col_offset, message, type(self))
+            if before is not None and keyword.value != "SELECT":
+                if before.row == keyword.row:
+                    message = "Q445 missing linespace between keywords {} and {}".format(
+                        before.value, keyword.value,
+                    )
+                    yield (query.lineno, query.col_offset, message, type(self))
+                if before.col + len(before.value) != keyword.col + len(keyword.value):
+                    message = "Q447 keywords {} and {} are not right aligned".format(
+                        before.value, keyword.value,
+                    )
+                    yield (query.lineno, query.col_offset, message, type(self))
 
 
 T = TypeVar('T')
