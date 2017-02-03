@@ -93,20 +93,30 @@ class Linter:
     def _check_query_alignment(
             self, query: ast.Str, parser: Parser,
     ) -> Generator[Tuple[int, int, str, type], Any, None]:
-        root_keywords = [token for token in parser if token.is_root_keyword]
+        root_keywords = [token for token in parser if token.is_root_keyword or token.value == ';']
         if root_keywords[0].row == root_keywords[-1].row:
             return
 
-        for before, root_keyword, _ in _pre_post_iter(root_keywords):
-            if before is not None and root_keyword.value != "SELECT":
-                if before.row == root_keyword.row:
+        for before, keyword, _ in _pre_post_iter(root_keywords):
+            if before is not None:
+                if before.value == ';' or keyword.value == ';':
+                    continue
+
+                if keyword.value == "SELECT":
+                    if keyword.col < before.col + len(before.value) + 1:
+                        yield (
+                            query.lineno, query.col_offset,
+                            'Q448 subquery should be aligned to the right of the river',
+                            type(self),
+                        )
+                elif before.row == keyword.row:
                     message = "Q445 missing linespace between root_keywords {} and {}".format(
-                        before.value, root_keyword.value,
+                        before.value, keyword.value,
                     )
                     yield (query.lineno, query.col_offset, message, type(self))
-                if before.col + len(before.value) != root_keyword.col + len(root_keyword.value):
+                elif before.col + len(before.value) != keyword.col + len(keyword.value):
                     message = "Q447 root_keywords {} and {} are not right aligned".format(
-                        before.value, root_keyword.value,
+                        before.value, keyword.value,
                     )
                     yield (query.lineno, query.col_offset, message, type(self))
 

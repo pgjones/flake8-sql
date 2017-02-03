@@ -9,8 +9,8 @@ query = """INSERT INTO xyz (clm1, clm2)
 query = """INSERT INTO xyz (clm1, clm2)
                 VALUES (abc, def)"""
 query = """INSERT INTO xyz (clm1, clm2)
-           SELECT abc
-           FROM def"""  # Q447
+                       SELECT abc
+                       FROM def"""  # Q447
 query = """SELECT abc
              FROM xyz
            JOIN ghj ON jkl = def

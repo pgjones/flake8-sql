@@ -64,6 +64,17 @@ aligned i.e.
     SELECT *
       FROM table
 
+Q448 subquery should be aligned to the right of the river
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+Any subquery should be aligned to the right of the river i.e.
+
+    SELECT *
+      FROM table
+     WHERE column IN
+           (SELECT column
+              FROM table)
+
 
 Limitations
 -----------
