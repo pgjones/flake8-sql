@@ -54,10 +54,10 @@ Q446 Missing newline after semicolon
 
 Semicolons must be at the end of the line.
 
-Q447 Keywords should be right aligned
+Q447 Root keywords should be right aligned
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-The keywords ``SELECT``, ``FROM``, ``INSERT INTO``, ``VALUES``,
+The root keywords ``SELECT``, ``FROM``, ``INSERT INTO``, ``VALUES``,
 ``DELETE FROM``, ``WHERE``, ``UPDATE``, and ``SET`` should be right
 aligned i.e.
 

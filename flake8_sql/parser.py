@@ -3,6 +3,11 @@ from typing import Any, Generator
 import sqlparse
 
 
+ROOT_KEYWORDS = {
+    'SELECT', 'FROM', 'JOIN', 'WHERE', 'UPDATE', 'SET', 'INTO', 'VALUES', 'AND', 'OR',
+}
+
+
 class Token:
 
     def __init__(self, token: sqlparse.sql.Token, row: int, col: int) -> None:
@@ -17,6 +22,10 @@ class Token:
     @property
     def is_keyword(self) -> bool:
         return self._token.is_keyword
+
+    @property
+    def is_root_keyword(self) -> bool:
+        return self.is_keyword and self.value.upper() in ROOT_KEYWORDS
 
     @property
     def is_function_name(self) -> bool:
