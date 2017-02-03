@@ -18,11 +18,12 @@ All the SQL reserved
 `keywords <https://github.com/pgjones/flake8-sql/blob/master/flake8_sql/keywords.py>`__
 should be uppercase.
 
-Q441 Name is not snake\_case
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+Q441 Name is not valid
+~~~~~~~~~~~~~~~~~~~~~~
 
-All the non SQL keywords should be snake\_case, which due to a
-limitation means simply that the word is lowercase.
+All the non SQL keywords should be snake\_case, start with a letter
+and not end with an `\_`. Due to a limitation snake\_case is checks
+ensure that the word is lowercase.
 
 Q442 Avoid abbreviated keywords
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~

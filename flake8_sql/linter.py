@@ -52,10 +52,11 @@ class Linter:
                         "Q442 avoid abbreviated keywords, {}".format(word),
                         type(self),
                     )
-            elif token.is_name and not word.islower():
+            elif token.is_name and (not word.islower() or word.endswith('_')):
                 yield(
                     query.lineno, query.col_offset,
-                    "Q441 name {} is not snake_case".format(word),
+                    "Q441 name {} is not valid, must be snake_case, and cannot "
+                    "end with `_`".format(word),
                     type(self),
                 )
 
