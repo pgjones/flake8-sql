@@ -2,10 +2,7 @@ from typing import Any, Generator
 
 import sqlparse
 
-
-ROOT_KEYWORDS = {
-    'SELECT', 'FROM', 'JOIN', 'WHERE', 'UPDATE', 'SET', 'INTO', 'VALUES', 'AND', 'OR',
-}
+from .keywords import ROOT_KEYWORDS
 
 
 class Token:

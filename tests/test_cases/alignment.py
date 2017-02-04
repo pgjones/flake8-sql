@@ -5,9 +5,9 @@ query = """SELECT abc
              FROM xyz
             WHERE def = 'def'"""
 query = """INSERT INTO xyz (clm1, clm2)
-           VALUES (abc, def)"""  # Q447
+                VALUES (abc, def)"""  # Q447
 query = """INSERT INTO xyz (clm1, clm2)
-                VALUES (abc, def)"""
+           VALUES (abc, def)"""
 query = """INSERT INTO xyz (clm1, clm2)
                        SELECT abc
                        FROM def"""  # Q447
