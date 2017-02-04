@@ -10,6 +10,9 @@ query = """SELECT abc
             WHERE def = 'def' AND feg = 'feg'"""  # Q445
 query = """SELECT abc
              FROM xyz
+  LEFT OUTER JOIN ijk ON abc.id = ijk.id"""
+query = """SELECT abc
+             FROM xyz
             WHERE def = 'def'
               AND feg = 'feg'
                OR ijk = 'ijk'"""

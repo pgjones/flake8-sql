@@ -22,7 +22,7 @@ class Token:
 
     @property
     def is_root_keyword(self) -> bool:
-        return self.is_keyword and self.value.upper() in ROOT_KEYWORDS
+        return self.is_keyword and self.value.split()[-1].upper() in ROOT_KEYWORDS
 
     @property
     def is_function_name(self) -> bool:
