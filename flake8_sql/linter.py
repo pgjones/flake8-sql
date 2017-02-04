@@ -2,7 +2,7 @@ import ast
 import re
 from typing import Any, Generator, Iterable, List, Optional, Tuple, TypeVar
 
-from .keywords import ABBREVIATED_KEYWORDS
+from .keywords import ABBREVIATED_KEYWORDS, ROOT_KEYWORD_DESCRIPTORS
 from .parser import Parser
 
 
@@ -122,7 +122,7 @@ class Linter:
                     )
                     yield (query.lineno, query.col_offset, message, type(self))
                 previous_root = token
-            elif not token.is_whitespace:
+            elif not token.is_whitespace and token.value not in ROOT_KEYWORD_DESCRIPTORS:
                 if token.col < previous_root.col + len(previous_root.value) + 1:
                     message = "Q449 token {} should be aligned to the right of the river".format(
                         token.value,

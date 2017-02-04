@@ -3,7 +3,8 @@ query = """SELECT abc
            WHERE def = 'def'"""  # Q447
 query = """SELECT abc
              FROM xyz
-            WHERE def = 'def'"""
+            WHERE def = 'def'
+         ORDER BY abc"""
 query = """SELECT abc
              FROM xyz
             WHERE def = 'def' AND feg = 'feg'"""  # Q445
@@ -14,6 +15,9 @@ query = """SELECT abc
                OR ijk = 'ijk'"""
 query = """INSERT INTO xyz (clm1, clm2)
                 VALUES (abc, def)"""  # Q447
+query = """INSERT INTO xyz (clm1, clm2)
+           VALUES (abc, def)
+         RETURNING id"""  # Q447
 query = """INSERT INTO xyz (clm1, clm2)
            VALUES (abc, def)"""
 query = """INSERT INTO xyz (clm1, clm2)
