@@ -93,30 +93,39 @@ class Linter:
     def _check_query_alignment(
             self, query: ast.Str, parser: Parser,
     ) -> Generator[Tuple[int, int, str, type], Any, None]:
-        root_keywords = [token for token in parser if token.is_root_keyword or token.value == ';']
-        if root_keywords[0].row == root_keywords[-1].row:
+        if len(query.s.splitlines()) == 1:  # Single line queries are exempt
             return
 
-        for before, keyword, _ in _pre_post_iter(root_keywords):
-            if before is not None:
-                if before.value == ';' or keyword.value == ';':
-                    continue
-
-                if keyword.value == "SELECT":
-                    if keyword.col < before.col + len(before.value) + 1:
+        previous_root = None
+        for token in parser:
+            if token.value == ';':
+                previous_root = None
+            elif previous_root is None:
+                if token.is_root_keyword:
+                    previous_root = token
+            elif token.is_root_keyword:
+                if token.value == "SELECT":
+                    if token.col < previous_root.col + len(previous_root.value) + 1:
                         yield (
                             query.lineno, query.col_offset,
                             'Q448 subquery should be aligned to the right of the river',
                             type(self),
                         )
-                elif before.row == keyword.row:
+                elif previous_root.row == token.row:
                     message = "Q445 missing linespace between root_keywords {} and {}".format(
-                        before.value, keyword.value,
+                        previous_root.value, token.value,
                     )
                     yield (query.lineno, query.col_offset, message, type(self))
-                elif before.col + len(before.value) != keyword.col + len(keyword.value):
+                elif previous_root.col + len(previous_root.value) != token.col + len(token.value):
                     message = "Q447 root_keywords {} and {} are not right aligned".format(
-                        before.value, keyword.value,
+                        previous_root.value, token.value,
+                    )
+                    yield (query.lineno, query.col_offset, message, type(self))
+                previous_root = token
+            elif not token.is_whitespace:
+                if token.col < previous_root.col + len(previous_root.value) + 1:
+                    message = "Q449 token {} should be aligned to the right of the river".format(
+                        token.value,
                     )
                     yield (query.lineno, query.col_offset, message, type(self))
 

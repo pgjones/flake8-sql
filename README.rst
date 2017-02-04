@@ -75,6 +75,14 @@ Any subquery should be aligned to the right of the river i.e.
            (SELECT column
               FROM table)
 
+Q449 tokens should be aligned to the right of the river
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+Any tokens should be aligned to the right of the river i.e
+
+    SELECT column1,
+           column2
+      FROM table
 
 Limitations
 -----------

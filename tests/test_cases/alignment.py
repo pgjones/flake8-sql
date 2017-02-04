@@ -23,3 +23,9 @@ query = """SELECT abc
              FROM xyz
            JOIN ghj ON jkl = def
             WHERE def = 'def'"""  # Q447
+query = """SELECT abc,
+def
+             FROM xyz"""  # Q449
+query = """SELECT abc,
+                  def
+             FROM xyz"""
