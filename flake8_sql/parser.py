@@ -59,14 +59,13 @@ class Token:
 class Parser:
 
     def __init__(self, sql: str, initial_offset: int) -> None:
-        self.sql = sql
         self._initial_offset = initial_offset
+        self._statements = sqlparse.parse(sql)
 
     def __iter__(self) -> Generator[Token, Any, None]:
-        statements = sqlparse.parse(self.sql)
         row = 0
         col = self._initial_offset
-        for statement in statements:
+        for statement in self._statements:
             for sql_token in statement.flatten():
                 token = Token(sql_token, row, col)
                 yield token
