@@ -84,6 +84,15 @@ Any tokens should be aligned to the right of the river i.e
            column2
       FROM table
 
+Configuration
+-------------
+
+At times it is simpler to use a reserved keyword as an identifier than
+go to the effort to avoid it. To allow for this set the
+``sql-excepted-names`` option to a comma separated list of these
+names.
+
+
 Limitations
 -----------
 

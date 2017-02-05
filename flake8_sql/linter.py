@@ -20,10 +20,27 @@ SQL_RE = re.compile(
 class Linter:
     name = 'sql'
     version = __version__
+    excepted_names = []
 
     def __init__(self, tree: Any, lines: List[str]) -> None:
         self.tree = tree
         self.lines = lines
+
+    @classmethod
+    def add_options(cls, parser):
+        parser.add_option(
+            '--sql-excepted-names',
+            default='',
+            action='store',
+            type='string',
+            help='Names not to consider keywords',
+            parse_from_config=True,
+            comma_separated_list=True,
+        )
+
+    @classmethod
+    def parse_options(cls, options):
+        cls.excepted_names = [name.upper() for name in options.sql_excepted_names]
 
     def run(self) -> Generator[Tuple[int, int, str, type], Any, None]:
         for node in ast.walk(self.tree):
@@ -40,7 +57,7 @@ class Linter:
         for token in parser:
             word = token.value
             if token.is_keyword or token.is_function_name:
-                if not word.isupper():
+                if not word.isupper() and word.upper() not in self.excepted_names:
                     yield(
                         query.lineno, query.col_offset,
                         "Q440 keyword {} is not uppercase".format(word),
