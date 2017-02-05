@@ -1,13 +1,13 @@
 query = """SELECT abc
-           FROM xyz
-           WHERE def = 'def'"""  # Q447
+           FROM   xyz
+           WHERE  def = 'def'"""  # Q447
 query = """SELECT abc
              FROM xyz
             WHERE def = 'def'
          ORDER BY abc"""
 query = """SELECT abc
              FROM xyz
-            WHERE def = 'def' AND feg = 'feg'"""  # Q445
+            WHERE def = 'def' AND feg = 'feg'"""  # Q447
 query = """SELECT abc
              FROM xyz
   LEFT OUTER JOIN ijk ON abc.id = ijk.id"""
@@ -28,7 +28,7 @@ query = """INSERT INTO xyz (clm1, clm2)
                        FROM def"""  # Q447
 query = """SELECT abc
              FROM xyz
-           JOIN ghj ON jkl = def
+           JOIN   ghj ON jkl = def
             WHERE def = 'def'"""  # Q447
 query = """SELECT abc,
 def

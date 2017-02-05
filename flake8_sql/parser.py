@@ -1,4 +1,4 @@
-from typing import Any, Generator
+from typing import Any, Generator, List
 
 import sqlparse
 
@@ -7,10 +7,11 @@ from .keywords import ROOT_KEYWORDS
 
 class Token:
 
-    def __init__(self, token: sqlparse.sql.Token, row: int, col: int) -> None:
+    def __init__(self, token: sqlparse.sql.Token, row: int, col: int, depth: int) -> None:
         self._token = token
         self.row = row
         self.col = col
+        self.depth = depth
 
     @property
     def is_whitespace(self) -> bool:
@@ -60,17 +61,35 @@ class Parser:
 
     def __init__(self, sql: str, initial_offset: int) -> None:
         self._initial_offset = initial_offset
-        self._statements = sqlparse.parse(sql)
+        self._tokens = []  # type: Tuple[sqlparse.sql.Token, int]
+        depth = 0
+        for statement in sqlparse.parse(sql):
+            for token in statement.tokens:
+                if token.is_group:
+                    self._tokens.extend(_flatten_group(token, depth))
+                else:
+                    self._tokens.append((token, depth))
 
     def __iter__(self) -> Generator[Token, Any, None]:
         row = 0
         col = self._initial_offset
-        for statement in self._statements:
-            for sql_token in statement.flatten():
-                token = Token(sql_token, row, col)
-                yield token
-                if token.is_newline:
-                    row += 1
-                    col = 0
-                else:
-                    col += len(token.value)
+        for sql_token, depth in self._tokens:
+            token = Token(sql_token, row, col, depth)
+            yield token
+            if token.is_newline:
+                row += 1
+                col = 0
+            else:
+                col += len(token.value)
+
+
+def _flatten_group(token: sqlparse.sql.Token, depth: int=0) -> List[sqlparse.sql.Token]:
+    tokens = []
+    for item in token.tokens:
+        if item.ttype == sqlparse.tokens.DML:
+            depth += 1
+        if item.is_group:
+            tokens.extend(_flatten_group(item, depth))
+        else:
+            tokens.append((item, depth))
+    return tokens

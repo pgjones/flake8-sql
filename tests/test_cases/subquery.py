@@ -13,3 +13,9 @@ query = """SELECT abc
             WHERE def = 'def';
 SELECT hij
   FROM ijk"""
+query = """UPDATE xyz
+              SET abc =
+                  (SELECT def
+                     FROM ijk
+                    WHERE feg = 'feg')
+            WHERE fgh = 'fgh'"""

@@ -96,22 +96,24 @@ class Linter:
         if len(query.s.splitlines()) == 1:  # Single line queries are exempt
             return
 
-        previous_root = None
+        roots = []
         for token in parser:
             if token.value == ';':
-                previous_root = None
-            elif previous_root is None:
+                roots = []
+            elif len(roots) < token.depth + 1:
                 if token.is_root_keyword:
-                    previous_root = token
-            elif token.is_root_keyword:
-                if token.value == "SELECT":
+                    roots.append(token)
+                if len(roots) > 1:
+                    previous_root = roots[token.depth - 1]
                     if token.col < previous_root.col + len(previous_root.value) + 1:
                         yield (
                             query.lineno, query.col_offset,
                             'Q448 subquery should be aligned to the right of the river',
                             type(self),
                         )
-                elif previous_root.row == token.row:
+            elif token.is_root_keyword:
+                previous_root = roots[token.depth]
+                if previous_root.row == token.row:
                     message = "Q445 missing linespace between root_keywords {} and {}".format(
                         previous_root.value, token.value,
                     )
@@ -121,8 +123,8 @@ class Linter:
                         previous_root.value, token.value,
                     )
                     yield (query.lineno, query.col_offset, message, type(self))
-                previous_root = token
             elif not token.is_whitespace and token.value not in ROOT_KEYWORD_DESCRIPTORS:
+                previous_root = roots[token.depth]
                 if token.col < previous_root.col + len(previous_root.value) + 1:
                     message = "Q449 token {} should be aligned to the right of the river".format(
                         token.value,
