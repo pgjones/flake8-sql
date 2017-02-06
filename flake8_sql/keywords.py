@@ -13,16 +13,20 @@ ROOT_KEYWORDS = {
     'INSERT',
     'JOIN',
     'LIMIT',
+    'OFFSET',
     'OR',
     'RETURNING',
     'SELECT',
     'SET',
+    'UNION',
     'UPDATE',
+    'USING',
     'VALUES',
     'WHERE',
 }
 
 ROOT_KEYWORD_DESCRIPTORS = {
+    'FOR',
     'GROUP',
     'INNER',
     'LEFT',
