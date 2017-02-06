@@ -11,6 +11,7 @@ ways. Firstly alignement should be with the ``INTO`` rather than
 ``INSERT`` keyword, i.e.
 
 ::
+
     INSERT INTO table (columns)
          VALUES (values)
 
