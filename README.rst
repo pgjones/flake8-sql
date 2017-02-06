@@ -4,9 +4,23 @@ Flake8-SQL
 |Build Status|
 
 Flake8-SQL is a `flake8 <http://flake8.readthedocs.org/en/latest/>`__
-plugin that looks for SQL queries and checks then against some
-opinionated styles. These styles mostly follow `SQL Style
-Guide <http://www.sqlstyle.guide/>`__, but differ as detailed below.
+plugin that looks for SQL queries and checks then against an
+opinionated style. This style mostly follows `SQL Style Guide
+<http://www.sqlstyle.guide/>`__, but differ in the two following
+ways. Firstly alignement should be with the ``INTO`` rather than
+``INSERT`` keyword, i.e.
+
+::
+    INSERT INTO table (columns)
+         VALUES (values)
+
+Secondly ``JOIN`` should be aligned to the left of the river, i.e.
+
+::
+
+    SELECT *
+      FROM table1
+      JOIN table2 ON ...
 
 Warnings
 --------
