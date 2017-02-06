@@ -61,6 +61,8 @@ The root keywords ``SELECT``, ``FROM``, ``INSERT``, ``VALUES``,
 ``WHERE``, ``UPDATE``, ``AND``, ``OR``, ``JOIN`` and ``SET`` should be
 right aligned i.e.
 
+::
+
     SELECT *
       FROM table
 
@@ -68,6 +70,8 @@ Q448 subquery should be aligned to the right of the river
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 Any subquery should be aligned to the right of the river i.e.
+
+::
 
     SELECT *
       FROM table
@@ -79,6 +83,8 @@ Q449 tokens should be aligned to the right of the river
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 Any tokens should be aligned to the right of the river i.e
+
+::
 
     SELECT column1,
            column2
