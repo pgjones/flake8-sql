@@ -17,12 +17,12 @@ query = """SELECT abc
               AND feg = 'feg'
                OR ijk = 'ijk'"""
 query = """INSERT INTO xyz (clm1, clm2)
-                VALUES (abc, def)"""  # Q447
+                 VALUES (abc, def)"""  # Q447
 query = """INSERT INTO xyz (clm1, clm2)
-           VALUES (abc, def)
-         RETURNING id"""  # Q447
+                VALUES (abc, def)
+              RETURNING id"""  # Q447
 query = """INSERT INTO xyz (clm1, clm2)
-           VALUES (abc, def)"""
+                VALUES (abc, def)"""
 query = """INSERT INTO xyz (clm1, clm2)
                        SELECT abc
                        FROM def"""  # Q447
