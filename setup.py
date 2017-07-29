@@ -44,8 +44,10 @@ setup(
         'flake8',
         'setuptools',
         'sqlparse',
-        'typing;python_version<"3.5"',
     ],
+    extras_require={
+        ':python_version < "3.5"': ['typing'],
+    },
     entry_points={
         'flake8.extension': [
             'Q4 = flake8_sql:Linter',
