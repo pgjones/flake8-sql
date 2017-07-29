@@ -44,6 +44,7 @@ setup(
         'flake8',
         'setuptools',
         'sqlparse',
+        'typing;python_version<"3.5"',
     ],
     entry_points={
         'flake8.extension': [
