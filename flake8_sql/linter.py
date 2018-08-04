@@ -1,5 +1,6 @@
 import ast
 import re
+from collections import deque
 from typing import Any, Generator, Iterable, List, Optional, Tuple, TypeVar
 
 from .keywords import ABBREVIATED_KEYWORDS, ROOT_KEYWORD_DESCRIPTORS
@@ -43,7 +44,7 @@ class Linter:
         cls.excepted_names = [name.upper() for name in options.sql_excepted_names]
 
     def run(self) -> Generator[Tuple[int, int, str, type], Any, None]:
-        for node in ast.walk(self.tree):
+        for node in _ast_walk(self.tree):
             if isinstance(node, ast.Str) and SQL_RE.search(node.s) is not None:
                 initial_offset = _get_initial_offset(node, self.lines)
                 parser = Parser(node.s, initial_offset)
@@ -169,3 +170,23 @@ def _get_initial_offset(query: ast.Str, physical_lines: List[str]) -> int:
     logical_lines = query.s.splitlines()
     first_physical_line = physical_lines[query.lineno - len(logical_lines)]
     return first_physical_line.find(logical_lines[0])
+
+
+def _ast_walk(node: ast.AST) -> Generator[ast.AST, None, None]:
+    if not hasattr(ast, 'JoinedStr'):  # No f-strings
+        yield from ast.walk(node)
+    else:  # f-strings supported
+        todo = deque([node])
+        while todo:
+            node = todo.popleft()
+            if isinstance(node, ast.JoinedStr):
+                merged_node = ast.Str(s='', lineno=node.lineno, col_offset=node.col_offset)
+                for child in ast.iter_child_nodes(node):
+                    if isinstance(child, ast.Str):
+                        merged_node.s += child.s
+                    elif isinstance(child, ast.FormattedValue):
+                        merged_node.s += 'formatted_value'
+                todo.append(merged_node)
+            else:
+                todo.extend(ast.iter_child_nodes(node))
+            yield node

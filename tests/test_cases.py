@@ -28,6 +28,9 @@ def _load_test_cases():
     wildcard_path = os.path.join(test_case_path, '*.py')
 
     for filename in glob.glob(wildcard_path):
+        print(filename)
+        if filename.endswith('fstring.py') and not hasattr(ast, 'JoinedStr'):
+            continue
         fullpath = os.path.join(test_case_path, filename)
         with open(fullpath) as file_:
             data = file_.read()
