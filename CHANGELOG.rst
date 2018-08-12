@@ -1,3 +1,9 @@
+0.3.0 2018-08-12
+----------------
+
+* Support f-string formatted SQL statements.
+* Install typing for Python versions < 3.5
+
 0.2.0 2017-02-06
 ----------------
 
