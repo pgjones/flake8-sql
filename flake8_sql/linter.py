@@ -55,24 +55,26 @@ class Linter:
     def _check_query_words(
             self, query: ast.Str, parser: Parser,
     ) -> Generator[Tuple[int, int, str, type], Any, None]:
+        query_end_lineno = _get_query_end_lineno(query)
+
         for token in parser:
             word = token.value
             if token.is_keyword or token.is_function_name:
                 if not word.isupper() and word.upper() not in self.excepted_names:
                     yield(
-                        query.lineno, query.col_offset,
+                        query_end_lineno, query.col_offset,
                         "Q440 keyword {} is not uppercase".format(word),
                         type(self),
                     )
                 if word.upper() in ABBREVIATED_KEYWORDS:
                     yield(
-                        query.lineno, query.col_offset,
+                        query_end_lineno, query.col_offset,
                         "Q442 avoid abbreviated keywords, {}".format(word),
                         type(self),
                     )
             elif token.is_name and (not word.islower() or word.endswith('_')):
                 yield(
-                    query.lineno, query.col_offset,
+                    query_end_lineno, query.col_offset,
                     "Q441 name {} is not valid, must be snake_case, and cannot "
                     "end with `_`".format(word),
                     type(self),
@@ -81,6 +83,8 @@ class Linter:
     def _check_query_whitespace(
             self, query: ast.Str, parser: Parser,
     ) -> Generator[Tuple[int, int, str, type], Any, None]:
+        query_end_lineno = _get_query_end_lineno(query)
+
         for before, token, after in _pre_post_iter(parser):
             pre_whitespace = (before is not None and before.is_whitespace)
             post_whitespace = (after is not None and after.is_whitespace)
@@ -88,13 +92,13 @@ class Linter:
             if token.is_punctuation:
                 if token.value == ',' and not post_whitespace:
                     yield(
-                        query.lineno, query.col_offset,
+                        query_end_lineno, query.col_offset,
                         'Q443 incorrect whitespace around comma',
                         type(self),
                     )
                 elif token.value == ';' and not post_newline:
                     yield(
-                        query.lineno, query.col_offset,
+                        query_end_lineno, query.col_offset,
                         'Q446 missing newline after semicolon',
                         type(self),
                     )
@@ -103,7 +107,7 @@ class Linter:
                     and (not pre_whitespace or not post_whitespace)
             ):
                 yield(
-                    query.lineno, query.col_offset,
+                    query_end_lineno, query.col_offset,
                     'Q444 incorrect whitespace around equals',
                     type(self),
                 )
@@ -113,6 +117,8 @@ class Linter:
     ) -> Generator[Tuple[int, int, str, type], Any, None]:
         if len(query.s.splitlines()) == 1:  # Single line queries are exempt
             return
+
+        query_end_lineno = _get_query_end_lineno(query)
 
         roots = []
         for token in parser:
@@ -125,7 +131,7 @@ class Linter:
                     previous_root = roots[token.depth - 1]
                     if token.col < previous_root.col + len(previous_root.value) + 1:
                         yield (
-                            query.lineno, query.col_offset,
+                            query_end_lineno, query.col_offset,
                             'Q448 subquery should be aligned to the right of the river',
                             type(self),
                         )
@@ -135,19 +141,19 @@ class Linter:
                     message = "Q445 missing linespace between root_keywords {} and {}".format(
                         previous_root.value, token.value,
                     )
-                    yield (query.lineno, query.col_offset, message, type(self))
+                    yield (query_end_lineno, query.col_offset, message, type(self))
                 elif previous_root.col + len(previous_root.value) != token.col + len(token.value):
                     message = "Q447 root_keywords {} and {} are not right aligned".format(
                         previous_root.value, token.value,
                     )
-                    yield (query.lineno, query.col_offset, message, type(self))
+                    yield (query_end_lineno, query.col_offset, message, type(self))
             elif not token.is_whitespace and token.value not in ROOT_KEYWORD_DESCRIPTORS:
                 previous_root = roots[token.depth]
                 if token.col < previous_root.col + len(previous_root.value) + 1:
                     message = "Q449 token {} should be aligned to the right of the river".format(
                         token.value,
                     )
-                    yield (query.lineno, query.col_offset, message, type(self))
+                    yield (query_end_lineno, query.col_offset, message, type(self))
 
 
 T = TypeVar('T')
@@ -168,8 +174,29 @@ def _pre_post_iter(
 
 def _get_initial_offset(query: ast.Str, physical_lines: List[str]) -> int:
     logical_lines = query.s.splitlines()
-    first_physical_line = physical_lines[query.lineno - len(logical_lines)]
+    query_end_lineno = _get_query_end_lineno(query)
+    first_physical_line = physical_lines[query_end_lineno - len(logical_lines)]
     return first_physical_line.find(logical_lines[0])
+
+
+def _get_query_end_lineno(query: ast.Str) -> int:
+    """Get the lineno for the last line of the given query.
+
+    In Python versions below 3.8, this could be obtained by `ast.expr.lineno`.
+    However Python 3.8 changed this to be the first line, and for the last line
+    you would instead have to use `ast.expr.end_lineno`. The real kicker here is
+    that this field is NOT required to be set by the compiler, so we have no
+    guarantee that it can be used. In practice, it is set for multi-line strings
+    which is suitable for our purposes - so we just need to handle the case for a
+    single-line string for which we can use the first lineno.
+    """
+    try:
+        end_lineno = query.end_lineno
+    except AttributeError:
+        # Should only happen for non multi-line strings or Python versions below 3.8.
+        end_lineno = query.lineno
+
+    return end_lineno
 
 
 def _ast_walk(node: ast.AST) -> Generator[ast.AST, None, None]:
