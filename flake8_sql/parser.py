@@ -1,4 +1,4 @@
-from typing import Any, Generator, List
+from typing import Any, Generator, List, Tuple
 
 import sqlparse
 
@@ -83,7 +83,7 @@ class Parser:
                 col += len(token.value)
 
 
-def _flatten_group(token: sqlparse.sql.Token, depth: int=0) -> List[sqlparse.sql.Token]:
+def _flatten_group(token: sqlparse.sql.Token, depth: int = 0) -> List[sqlparse.sql.Token]:
     tokens = []
     for item in token.tokens:
         if item.ttype == sqlparse.tokens.DML:
