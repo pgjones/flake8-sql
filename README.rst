@@ -124,8 +124,8 @@ simply add ``# noqa`` to have this plugin ignore the string.
 
 F-Strings are formatted with the formatted values, ``{...}``, replaced
 with the constant ``formatted_value`` before being linted. This leads
-to the error message referring to ``formatted_value``s rather than
-what was actually written.
+to the error message referring to ``formatted_value`` rather than what
+was actually written.
 
 
 .. |Build Status| image:: https://travis-ci.org/pgjones/flake8-sql.svg?branch=master
