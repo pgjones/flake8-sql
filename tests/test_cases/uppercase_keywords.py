@@ -8,3 +8,4 @@ query = "delete from tbl"  # Q440
 query = "DELETE FROM tbl"
 query = "update tbl set clmn = x"  # Q440
 query = "UPDATE tbl SET clmn = x"
+qyart = "UPDATE tbl SET EXTRACT(abc from xyz)"  # Q440

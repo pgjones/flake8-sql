@@ -23,7 +23,12 @@ class Token:
 
     @property
     def is_root_keyword(self) -> bool:
-        return self.is_keyword and self.value.split()[-1].upper() in ROOT_KEYWORDS
+        if not self.is_keyword:
+            return False
+        value = self.value.split()[-1].upper()
+        if value == "FROM" and isinstance(self._token.parent.parent, sqlparse.sql.Function):
+            return False
+        return value in ROOT_KEYWORDS
 
     @property
     def is_function_name(self) -> bool:

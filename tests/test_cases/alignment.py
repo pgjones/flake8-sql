@@ -36,3 +36,6 @@ def
 query = """SELECT abc,
                   def
              FROM xyz"""
+query = """SELECT abc
+             FROM xyz
+            WHERE abc >= EXTRACT(abc FROM xyz.def)"""
