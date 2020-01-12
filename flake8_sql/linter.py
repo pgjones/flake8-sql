@@ -7,7 +7,7 @@ from .keywords import ABBREVIATED_KEYWORDS, ROOT_KEYWORD_DESCRIPTORS
 from .parser import Parser
 
 
-__version__ = '0.3.0'
+__version__ = '0.4.0'
 
 SQL_RE = re.compile(
     r'(select\s.*from\s|'

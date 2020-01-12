@@ -1,3 +1,9 @@
+0.4.0 2020-01-12
+----------------
+
+* Support Python 3.7 & 3.8, drop Python 3.3 & 3.4.
+* Do not consider FROM keywords within functions as ROOT keywords.
+
 0.3.0 2018-08-12
 ----------------
 
