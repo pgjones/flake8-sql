@@ -207,7 +207,8 @@ def _ast_walk(node: ast.AST) -> Generator[ast.AST, None, None]:
         while todo:
             node = todo.popleft()
             if isinstance(node, ast.JoinedStr):
-                merged_node = ast.Str(s='', lineno=node.lineno, col_offset=node.col_offset)
+                lineno = _get_query_end_lineno(node)
+                merged_node = ast.Str(s='', lineno=lineno, col_offset=node.col_offset)
                 for child in ast.iter_child_nodes(node):
                     if isinstance(child, ast.Str):
                         merged_node.s += child.s
