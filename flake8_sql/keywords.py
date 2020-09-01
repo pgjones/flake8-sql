@@ -1,5 +1,4 @@
 ABBREVIATED_KEYWORDS = {
-    'ABS',
     'CHAR',
     'CHAR_LENGTH',
     'DEC',
