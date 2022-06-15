@@ -182,13 +182,12 @@ def _get_initial_offset(query: ast.Str, physical_lines: List[str]) -> int:
 def _get_query_end_lineno(query: ast.Str) -> int:
     """Get the lineno for the last line of the given query.
 
-    In Python versions below 3.8, this could be obtained by `ast.expr.lineno`.
-    However Python 3.8 changed this to be the first line, and for the last line
-    you would instead have to use `ast.expr.end_lineno`. The real kicker here is
-    that this field is NOT required to be set by the compiler, so we have no
-    guarantee that it can be used. In practice, it is set for multi-line strings
-    which is suitable for our purposes - so we just need to handle the case for a
-    single-line string for which we can use the first lineno.
+    - Python <3.8 - `ast.expr.lineno` gives last line.
+    - Python =3.8 - Introduced `ast.expr.lineno` and `ast.expr.end_lineno` for first
+                    and last line respectively. `ast.expr.end_lineno` is only set for
+                    multi-line strings, fallback to `ast.expr.lineno` if not set.
+    - Python >3.8 - `ast.expr.end_lineno` is `None` for single-line strings, fallback
+                    to `ast.expr.lineno` if `None`.
     """
     try:
         end_lineno = query.end_lineno
@@ -196,7 +195,7 @@ def _get_query_end_lineno(query: ast.Str) -> int:
         # Should only happen for non multi-line strings or Python versions below 3.8.
         end_lineno = query.lineno
 
-    return end_lineno
+    return end_lineno or query.lineno
 
 
 def _ast_walk(node: ast.AST) -> Generator[ast.AST, None, None]:
